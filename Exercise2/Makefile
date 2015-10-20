@@ -8,7 +8,7 @@
 
 TYPECHECK = Exercise_typecheck.hs
 
-TEMPDIR := $(shell mktemp -ud --tmpdir fp-typecheck-XXXX)
+TEMPDIR := $(shell mktemp -udt fp-typecheck-XXXX)
 
 COMMAND = runghc $(TYPECHECK)
 
@@ -21,8 +21,8 @@ typecheck: $(TYPECHECK) integrity Exercise.hs
 
 	@echo \* Type checking Exercise.hs...
 	@echo
-	cp -t $(TEMPDIR) Exercise.hs
-	cp -t $(TEMPDIR) $(TYPECHECK)
+	@cp Exercise.hs $(TEMPDIR)
+	@cp $(TYPECHECK) $(TEMPDIR)
 	@echo "$(COMMAND)"
 	@cd $(TEMPDIR) && $(COMMAND) \
 	 || (echo "* Failed to type check your Exercise.hs."; \
@@ -44,10 +44,10 @@ tests:
 	runhaskell TestBench
 
 integrity:
-	@echo '20659fd646dedaea59e3112da14aef9c3efc6e18  $(TYPECHECK)' \
-	| sha1sum -c --quiet \
+	@test "20659fd646dedaea59e3112da14aef9c3efc6e18  $(TYPECHECK)" \
+        == "$(shell sha1sum $(TYPECHECK))" \
 	|| ( echo "Error: somebody changed $(TYPECHECK)."; \
-	     echo "The results of the pre-submit check might be wrong." \
+	     echo "The results of the pre-submit check might be wrong."; \
 	     echo "Please re-download $(TYPECHECK) from the web site."; \
 	     false )
 
